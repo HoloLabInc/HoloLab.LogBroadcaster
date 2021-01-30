@@ -1,9 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
+﻿using System;
 using System.Text;
 using UnityEngine;
+using System.Net;
+using System.IO;
+
+#if WINDOWS_UWP
+using System.Threading.Tasks;
+using Windows.Networking;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
+#else
+using System.Net;
+using System.Net.Sockets;
+#endif
 
 namespace HoloLab.LogBroadcaster
 {
@@ -36,7 +45,11 @@ namespace HoloLab.LogBroadcaster
         [SerializeField]
         int port = 20080;
 
-#if UNITY_UWP
+#if WINDOWS_UWP
+        DatagramSocket socket;
+        IOutputStream datagram;
+        StreamWriter writer;
+        string broadcastAddress;
 #else
         /// <summary>
         /// UDPクライアント
@@ -59,8 +72,15 @@ namespace HoloLab.LogBroadcaster
         /// </summary>
         void Awake()
         {
+#if WINDOWS_UWP
+            Task.Run(async () =>
+            {
+                socket = new DatagramSocket();
+                broadcastAddress = IPAddress.Broadcast.ToString();
 
-#if UNITY_UWP
+                datagram = await socket.GetOutputStreamAsync(new HostName(isBroadcast ? broadcastAddress : targetIpAddress), port.ToString());
+                writer = new StreamWriter(datagram.AsStreamForWrite());
+            }).Wait();
 #else
             udpclient = new UdpClient();
             udpclient.EnableBroadcast = isBroadcast;
@@ -77,7 +97,10 @@ namespace HoloLab.LogBroadcaster
         {
             Application.logMessageReceived -= Application_logMessageReceived;
 
-#if UNITY_UWP
+#if WINDOWS_UWP
+            writer?.Dispose();
+            datagram?.Dispose();
+            socket?.Dispose();
 #else
             udpclient?.Dispose();
 #endif
@@ -101,22 +124,17 @@ namespace HoloLab.LogBroadcaster
                 message.stackTrace = stackTrace;
             }
 
-#if UNITY_UWP
+            var json = JsonUtility.ToJson(message);
+
+#if WINDOWS_UWP
+            Task.Run(async () => {
+                await writer?.WriteAsync(json);
+                await writer?.FlushAsync();
+            }).Wait();
 #else
-            var buffer = Encoding.UTF8.GetBytes(JsonUtility.ToJson(message));
+            var buffer = Encoding.UTF8.GetBytes(json);
             udpclient.Send(buffer, buffer.Length);
 #endif
         }
-
-#if UNITY_UWP
-        Task.Run(async () =>
-        {
-            DatagramSocket socket = new DatagramSocket();
-            string Address = IPAddress.Broadcast.ToString();
-            var datagram = await socket.GetOutputStreamAsync(new HostName(Address), port.ToString());
-            writer = new StreamWriter(datagram.AsStreamForWrite());
-        });
-#else
-#endif
     }
 }
