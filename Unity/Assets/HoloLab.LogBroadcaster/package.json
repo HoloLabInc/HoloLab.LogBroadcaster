@@ -12,5 +12,13 @@
     "keywords": [
         "Log",
         "HoloLens"
+    ],
+
+    "samples": [
+        {
+            "displayName": "SampleScene",
+            "description": "How to use.",
+            "path": "Sampl/"
+        }
     ]
 }
