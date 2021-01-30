@@ -16,9 +16,9 @@
 
     "samples": [
         {
-            "displayName": "SampleScene",
+            "displayName": "Sample",
             "description": "How to use.",
-            "path": "Sample"
+            "path": "Runtime/Sample"
         }
     ]
 }
