@@ -1,0 +1,19 @@
+{
+    "name": "com.hololab.log-broadcaster",
+    "displayName": "Log Broadcaster", 
+    "version": "0.1.0",               
+    "unity": "2019.4",
+    "description": "Unity log broadcaster",
+    "author": {
+        "name": "kaorun55",
+        "url": "https://github.com/HoloLabInc"
+    },
+
+    "keywords": [
+        "Log",
+        "HoloLens",
+    ],
+
+    "dependencies": {
+    }
+}
