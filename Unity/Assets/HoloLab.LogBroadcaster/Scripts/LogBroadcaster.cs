@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using UnityEngine;
 using System.Net;
 using System.IO;
@@ -10,6 +9,7 @@ using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 #else
+using System.Text;
 using System.Net;
 using System.Net.Sockets;
 #endif
