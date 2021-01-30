@@ -11,9 +11,6 @@
 
     "keywords": [
         "Log",
-        "HoloLens",
-    ],
-
-    "dependencies": {
-    }
+        "HoloLens"
+    ]
 }
