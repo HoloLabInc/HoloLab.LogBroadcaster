@@ -1,0 +1,2 @@
+# LogBroadcaster
+UnityのDebug.Log()をUDPブロードキャストします。
