@@ -45,10 +45,24 @@ namespace HoloLab.LogBroadcaster
         [SerializeField]
         int port = 20080;
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP        /// <summary>
+        /// ソケット
+        /// </summary>
         DatagramSocket socket;
-        IOutputStream datagram;
+
+        /// <summary>
+        /// ストリーム
+        /// </summary>
+        IOutputStream stream;
+
+        /// <summary>
+        /// 書き込み
+        /// </summary>
         StreamWriter writer;
+
+        /// <summary>
+        /// ブロードキャストアドレス
+        /// </summary>
         string broadcastAddress;
 #else
         /// <summary>
@@ -78,8 +92,8 @@ namespace HoloLab.LogBroadcaster
                 socket = new DatagramSocket();
                 broadcastAddress = IPAddress.Broadcast.ToString();
 
-                datagram = await socket.GetOutputStreamAsync(new HostName(isBroadcast ? broadcastAddress : targetIpAddress), port.ToString());
-                writer = new StreamWriter(datagram.AsStreamForWrite());
+                stream = await socket.GetOutputStreamAsync(new HostName(isBroadcast ? broadcastAddress : targetIpAddress), port.ToString());
+                writer = new StreamWriter(stream.AsStreamForWrite());
             }).Wait();
 #else
             udpclient = new UdpClient();
@@ -99,7 +113,7 @@ namespace HoloLab.LogBroadcaster
 
 #if WINDOWS_UWP
             writer?.Dispose();
-            datagram?.Dispose();
+            stream?.Dispose();
             socket?.Dispose();
 #else
             udpclient?.Dispose();
